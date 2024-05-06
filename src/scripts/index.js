@@ -1,30 +1,65 @@
+const placesList = document.querySelector('.places__list');
+const popupGallery = document.querySelector('.popup_type_image');
+const popupGalleryImage = popupGallery.querySelector('.popup__image');
+const popupGalleryCaption = popupGallery.querySelector('.popup__caption');
+const popupEditProfile = document.querySelector('.popup_type_edit');
+const popupNewCard = document.querySelector('.popup_type_new-card');
+const editProfileButton = document.querySelector('.profile__edit-button');
+const addCardButton = document.querySelector('.profile__add-button');
+const profileName = document.querySelector('.profile__title');
+const profileJob = document.querySelector('.profile__description');
+const formEditProfile = popupEditProfile.querySelector('.popup__form');
+const nameInputEditProfile = formEditProfile.querySelector('.popup__input_type_name');
+const jobInputEditProfile = formEditProfile.querySelector('.popup__input_type_description');
+const formNewCard = popupNewCard.querySelector('.popup__form');
+const nameInputNewCard = formNewCard.querySelector('.popup__input_type_card-name');
+const linkInputNewCard = formNewCard.querySelector('.popup__input_type_url');
+
 import '../pages/index.css';
 import {initialCards} from './cards.js';
+import {createCard, deleteCard, likeCard} from '../components/card.js';
+import {openModal, closeModal} from '../components/modal.js';
 
-const cardTemplate = '#card-template';
-const placesList = document.querySelector('.places__list');
-
-const fillTemplateCard = function (initialCard) {
-    const cardTemplateElement = document.querySelector(cardTemplate).content;
-    const cardElement = cardTemplateElement.querySelector('.card').cloneNode(true);
-    const cardImage = cardElement.querySelector('.card__image');
-    cardImage.src = initialCard.link;
-    cardImage.alt = `Фотография места ${initialCard.name}`;
-    cardElement.querySelector('.card__title').textContent = initialCard.name;
-    return cardElement;
+const handleEditProfileFormSubmit = (evt, popup) => {
+    profileName.textContent = nameInputEditProfile.value;
+    profileJob.textContent = jobInputEditProfile.value;
+    handleFormSubmit(evt, popup);
 }
 
-const createCard = function (initialCard, deleteCard) {
-    const cardElement = fillTemplateCard(initialCard);
-    cardElement.querySelector('.card__delete-button').addEventListener('click',  () => deleteCard(cardElement));
-    return cardElement;
+const handleAddCardFormSubmit = (evt, popup) => {
+    const newCard = {name: nameInputNewCard.value, link: linkInputNewCard.value};
+    const cardElement = createCard(newCard, deleteCard, likeCard, showCard)
+    placesList.prepend(cardElement);
+    nameInputNewCard.value = '';
+    linkInputNewCard.value = '';
+    handleFormSubmit(evt, popup);
 }
 
-const deleteCard = function (card) {
-    card.remove();
+const handleFormSubmit = (evt, popup) => {
+    evt.preventDefault();
+    closeModal(popup);
 }
 
-initialCards.forEach(function (initialCard) {
-    const cardElement= createCard(initialCard, deleteCard);
+const showCard = (card) => {
+    const cardImage = card.querySelector('.card__image');
+    popupGalleryImage.src = cardImage.src;
+    popupGalleryImage.alt = cardImage.alt;
+    popupGalleryCaption.textContent = card.querySelector('.card__title').textContent;
+    openModal(popupGallery);
+}
+
+initialCards.forEach((initialCard) => {
+    const cardElement = createCard(initialCard, deleteCard, likeCard, showCard);
     placesList.append(cardElement);
+});
+
+editProfileButton.addEventListener('click', () => {
+    nameInputEditProfile.value = profileName.textContent;
+    jobInputEditProfile.value = profileJob.textContent;
+    openModal(popupEditProfile);
+    formEditProfile.addEventListener('submit', (evt) => handleEditProfileFormSubmit(evt, popupEditProfile));
+});
+addCardButton.addEventListener('click', () => {
+    openModal(popupNewCard);
+    formNewCard.addEventListener('submit', (evt) => handleAddCardFormSubmit(evt, popupNewCard));
 });
