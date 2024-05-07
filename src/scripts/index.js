@@ -28,10 +28,8 @@ const handleEditProfileFormSubmit = (evt, popup) => {
 
 const handleAddCardFormSubmit = (evt, popup) => {
     const newCard = {name: nameInputNewCard.value, link: linkInputNewCard.value};
-    const cardElement = createCard(newCard, deleteCard, likeCard, showCard)
-    placesList.prepend(cardElement);
-    nameInputNewCard.value = '';
-    linkInputNewCard.value = '';
+    renderCard(newCard, 'prepend');
+    evt.target.reset();
     handleFormSubmit(evt, popup);
 }
 
@@ -48,18 +46,24 @@ const showCard = (card) => {
     openModal(popupGallery);
 }
 
+const renderCard = (initialCard, method = "prepend") => {
+    const cardElement = createCard(initialCard, {deleteCard, likeCard, showCard});
+
+    placesList[ method ](cardElement);
+}
+
 initialCards.forEach((initialCard) => {
-    const cardElement = createCard(initialCard, deleteCard, likeCard, showCard);
-    placesList.append(cardElement);
+    renderCard(initialCard, 'append');
 });
 
 editProfileButton.addEventListener('click', () => {
     nameInputEditProfile.value = profileName.textContent;
     jobInputEditProfile.value = profileJob.textContent;
     openModal(popupEditProfile);
-    formEditProfile.addEventListener('submit', (evt) => handleEditProfileFormSubmit(evt, popupEditProfile));
 });
 addCardButton.addEventListener('click', () => {
     openModal(popupNewCard);
-    formNewCard.addEventListener('submit', (evt) => handleAddCardFormSubmit(evt, popupNewCard));
 });
+
+formEditProfile.addEventListener('submit', (evt) => handleEditProfileFormSubmit(evt, popupEditProfile));
+formNewCard.addEventListener('submit', (evt) => handleAddCardFormSubmit(evt, popupNewCard));
