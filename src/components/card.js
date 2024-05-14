@@ -1,3 +1,5 @@
+import {changeLikeStatus} from "./api";
+
 const cardTemplate = document.querySelector('#card-template').content.querySelector('.card');
 
 const fillTemplateCard = (initialCard) => {
@@ -13,17 +15,39 @@ const deleteCard = (card) => {
     card.remove();
 }
 
-const likeCard = (likeButton) => {
-    likeButton.classList.toggle('card__like-button_is-active');
+const likeCard = (likeButton, cardId) => {
+    changeLikeStatus(cardId, likeButton.classList.contains('card__like-button_is-active'))
+        .then((result) => {
+            likeButton.classList.toggle('card__like-button_is-active');
+            likeButton.nextElementSibling.textContent = result.likes.length;
+        })
+        .catch((err) => {
+            console.log(err);
+        });
 }
 
-const createCard = (initialCard, callbacks) => {
-    const cardElement = fillTemplateCard(initialCard);
+const createCard = (initialCard, callbacks, userId) => {
+    const cardElement = fillTemplateCard(initialCard, userId);
     const cardLikeButton = cardElement.querySelector('.card__like-button');
+    const deleteButton = cardElement.querySelector('.card__delete-button');
+    const likeCounter = cardElement.querySelector('.card__like-counter');
+    const likeButtonState = cardElement.querySelector('.card__like-button');
 
-    cardElement.querySelector('.card__delete-button').addEventListener('click', () => callbacks.deleteCard(cardElement));
+    if (initialCard.owner._id !== userId) {
+        deleteButton.remove();
+    } else {
+        deleteButton.addEventListener('click', () => callbacks.deleteCard(cardElement));
+    }
+
+    initialCard.likes.forEach((like) => {
+        if (like._id === userId) {
+            likeButtonState.classList.add('card__like-button_is-active');
+        }
+    });
+    likeCounter.textContent = initialCard.likes.length;
+
     cardElement.querySelector('.card__image').addEventListener('click', () => callbacks.showCard(cardElement));
-    cardLikeButton.addEventListener('click', () => callbacks.likeCard(cardLikeButton));
+    cardLikeButton.addEventListener('click', () => callbacks.likeCard(cardLikeButton, initialCard._id));
     return cardElement;
 }
 
