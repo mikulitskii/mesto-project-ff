@@ -32,6 +32,10 @@ const editUser = (name, about) => {
     return createRequest('/users/me', 'PATCH', {name, about});
 }
 
+const editAvatar = (link) => {
+    return createRequest('/users/me/avatar', 'PATCH', {avatar: link});
+}
+
 const addCard = (name, link) => {
     return createRequest('/cards', 'POST', {name, link});
 }
@@ -52,4 +56,8 @@ const changeLikeStatus = (cardId, isLiked) => {
     }
 }
 
-export {getInitialCards, getUser, editUser, addCard, changeLikeStatus};
+const deleteCard = (cardId) => {
+    return createRequest(`/cards/${cardId}`, 'DELETE');
+}
+
+export {getInitialCards, getUser, editUser, addCard, changeLikeStatus, deleteCard as deleteCardApi, editAvatar};

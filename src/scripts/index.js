@@ -4,8 +4,10 @@ const popupGalleryImage = popupGallery.querySelector('.popup__image');
 const popupGalleryCaption = popupGallery.querySelector('.popup__caption');
 const popupEditProfile = document.querySelector('.popup_type_edit');
 const popupNewCard = document.querySelector('.popup_type_new-card');
+const popupEditAvatar = document.querySelector('.popup_type_edit-avatar');
 const editProfileButton = document.querySelector('.profile__edit-button');
 const addCardButton = document.querySelector('.profile__add-button');
+const profileImage = document.querySelector('.profile__image');
 const profileName = document.querySelector('.profile__title');
 const profileJob = document.querySelector('.profile__description');
 const formEditProfile = popupEditProfile.querySelector('.popup__form');
@@ -14,6 +16,8 @@ const jobInputEditProfile = formEditProfile.querySelector('.popup__input_type_de
 const formNewCard = popupNewCard.querySelector('.popup__form');
 const nameInputNewCard = formNewCard.querySelector('.popup__input_type_card-name');
 const linkInputNewCard = formNewCard.querySelector('.popup__input_type_url');
+const formEditAvatar = popupEditAvatar.querySelector('.popup__form');
+const linkInputEditAvatar = formEditAvatar.querySelector('.popup__input_type_avatar-link');
 const validationConfig = {
     formSelector: '.popup__form',
     inputSelector: '.popup__input',
@@ -27,10 +31,10 @@ import '../pages/index.css';
 import {createCard, deleteCard, likeCard} from '../components/card.js';
 import {closeModal, openModal} from '../components/modal.js';
 import {clearValidation, enableValidation} from '../components/validation.js';
-import {addCard, editUser, getInitialCards, getUser} from '../components/api.js';
+import {addCard, editUser, getInitialCards, getUser, editAvatar} from '../components/api.js';
 
 const handleEditProfileFormSubmit = (evt, popup) => {
-    evt.preventDefault();
+    handleFormSubmit(evt, popup);
     editUser(nameInputEditProfile.value, jobInputEditProfile.value)
         .then((result) => {
             profileName.textContent = result.name;
@@ -42,12 +46,23 @@ const handleEditProfileFormSubmit = (evt, popup) => {
         });
 }
 
+const handleEditAvatarFormSubmit = (evt, popup) => {
+    handleFormSubmit(evt, popup);
+    editAvatar(linkInputEditAvatar.value)
+        .then((result) => {
+            profileImage.style.backgroundImage = `url(${result.avatar})`;
+            closeModal(popup);
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+}
+
 const handleAddCardFormSubmit = (evt, popup) => {
-    // handleFormSubmit(evt, popup);
-    evt.preventDefault();
+    handleFormSubmit(evt, popup);
     addCard(nameInputNewCard.value, linkInputNewCard.value)
         .then((result) => {
-            renderCard({name: result.name, link: result.link}, 'prepend');
+            renderCard(result, 'prepend', result.owner._id);
             evt.target.reset();
             closeModal(popup);
         })
@@ -56,10 +71,10 @@ const handleAddCardFormSubmit = (evt, popup) => {
         });
 }
 
-// const handleFormSubmit = (evt, popup) => {
-//     evt.preventDefault();
-//     closeModal(popup);
-// }
+const handleFormSubmit = (evt, popup) => {
+    evt.preventDefault();
+    popup.querySelector('.popup__button').textContent = 'Сохранение...';
+}
 
 const showCard = (card) => {
     const cardImage = card.querySelector('.card__image');
@@ -86,13 +101,21 @@ addCardButton.addEventListener('click', () => {
     openModal(popupNewCard);
 });
 
+profileImage.addEventListener('click', () => {
+    clearValidation(formEditAvatar, validationConfig);
+    openModal(popupEditAvatar);
+});
+
 formEditProfile.addEventListener('submit', (evt) => handleEditProfileFormSubmit(evt, popupEditProfile));
 formNewCard.addEventListener('submit', (evt) => handleAddCardFormSubmit(evt, popupNewCard));
+formEditAvatar.addEventListener('submit', (evt) => handleEditAvatarFormSubmit(evt, popupEditAvatar));
 
 Promise.all([getInitialCards(), getUser()])
     .then((result) => {
         const [initialCards, userData] = result;
-        console.log(initialCards, userData);
+        profileImage.style.backgroundImage = `url(${userData.avatar})`;
+        profileName.textContent = userData.name;
+        profileJob.textContent = userData.about;
         Array.from(initialCards).forEach((initialCard) => {
             renderCard(initialCard, 'append', userData._id);
         });

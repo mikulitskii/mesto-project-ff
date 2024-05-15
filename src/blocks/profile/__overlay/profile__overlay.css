@@ -1,0 +1,9 @@
+.profile__overlay {
+  position: absolute;
+  inset: 0;
+}
+
+.profile__overlay:hover {
+  background: rgba(0, 0, 0, 0.8) url('../../../images/edit-icon.svg') no-repeat center / 26px 26px;
+  cursor: pointer;
+}

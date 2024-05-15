@@ -1,4 +1,5 @@
-import {changeLikeStatus} from "./api";
+import {changeLikeStatus, deleteCardApi} from "./api";
+import {getModalPromise} from "./modal";
 
 const cardTemplate = document.querySelector('#card-template').content.querySelector('.card');
 
@@ -11,8 +12,25 @@ const fillTemplateCard = (initialCard) => {
     return cardElement;
 }
 
-const deleteCard = (card) => {
-    card.remove();
+const deleteCard = (card, cardId) => {
+    const popupDeleteCard = document.querySelector('.popup_type_delete-card');
+    popupDeleteCard.classList.add('popup_is-opened');
+    getModalPromise(popupDeleteCard)
+        .then((result) => {
+            deleteCardApi(cardId)
+                .then((result) => {
+                    card.remove();
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+        .finally(() => {
+            popupDeleteCard.classList.remove('popup_is-opened');
+        });
 }
 
 const likeCard = (likeButton, cardId) => {
@@ -36,7 +54,7 @@ const createCard = (initialCard, callbacks, userId) => {
     if (initialCard.owner._id !== userId) {
         deleteButton.remove();
     } else {
-        deleteButton.addEventListener('click', () => callbacks.deleteCard(cardElement));
+        deleteButton.addEventListener('click', () => callbacks.deleteCard(cardElement, initialCard._id));
     }
 
     initialCard.likes.forEach((like) => {

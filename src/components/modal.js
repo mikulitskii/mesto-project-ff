@@ -11,7 +11,6 @@ const handleEscape = (evt) => {
     }
 };
 
-
 const openModal = (popup) => {
     popup.classList.add('popup_is-opened');
     popup.addEventListener('click', handlePopupClose);
@@ -24,4 +23,26 @@ const closeModal = (popup) => {
     document.removeEventListener('keyup', handleEscape);
 }
 
-export {openModal, closeModal};
+const getModalPromise = (popup) => {
+    return new Promise((resolve, reject) => {
+
+        const removeListeners = () => {
+            popup.removeEventListener('click', handlePopupClose);
+            document.removeEventListener('keyup', handlePopupClose);
+        }
+        const handlePopupClose = (evt) => {
+            if (evt.target.classList.contains('popup__close') || evt.target.classList.contains('popup') || evt.key === 'Escape') {
+                removeListeners();
+                reject('User closed modal window');
+            } else if (evt.target.classList.contains('popup__button')) {
+                removeListeners();
+                resolve(evt.target);
+            }
+        };
+
+        popup.addEventListener('click', handlePopupClose);
+        document.addEventListener('keyup', handlePopupClose);
+    });
+}
+
+export {openModal, closeModal, getModalPromise};
