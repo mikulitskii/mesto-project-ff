@@ -1,7 +1,11 @@
 import {changeLikeStatus, deleteCardApi} from "./api";
-import {getModalPromise} from "./modal";
+import {openModal, closeModal} from "./modal";
 
 const cardTemplate = document.querySelector('#card-template').content.querySelector('.card');
+const popupDeleteCard = document.querySelector('.popup_type_delete-card');
+const popupDeleteButton = popupDeleteCard.querySelector('.popup__button');
+let cardForDelete = null;
+let cardIdForDelete = null;
 
 const fillTemplateCard = (initialCard) => {
     const cardElement = cardTemplate.cloneNode(true);
@@ -12,25 +16,25 @@ const fillTemplateCard = (initialCard) => {
     return cardElement;
 }
 
+const confirmDeleteCard = () => {
+    if (cardForDelete && cardIdForDelete) {
+        deleteCardApi(cardIdForDelete)
+            .then(() => {
+                cardForDelete.remove();
+                closeModal(popupDeleteCard);
+                popupDeleteButton.removeEventListener('click', confirmDeleteCard);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+}
+
 const deleteCard = (card, cardId) => {
-    const popupDeleteCard = document.querySelector('.popup_type_delete-card');
-    popupDeleteCard.classList.add('popup_is-opened');
-    getModalPromise(popupDeleteCard)
-        .then((result) => {
-            deleteCardApi(cardId)
-                .then((result) => {
-                    card.remove();
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        })
-        .catch((err) => {
-            console.log(err);
-        })
-        .finally(() => {
-            popupDeleteCard.classList.remove('popup_is-opened');
-        });
+    cardForDelete = card;
+    cardIdForDelete = cardId;
+    popupDeleteButton.addEventListener('click', confirmDeleteCard);
+    openModal(popupDeleteCard);
 }
 
 const likeCard = (likeButton, cardId) => {
