@@ -1,9 +1,7 @@
 import {changeLikeStatus, deleteCardApi} from "./api";
 import {openModal, closeModal} from "./modal";
+import {cardTemplate, popupDeleteCard} from "../scripts/constants";
 
-const cardTemplate = document.querySelector('#card-template').content.querySelector('.card');
-const popupDeleteCard = document.querySelector('.popup_type_delete-card');
-const popupDeleteButton = popupDeleteCard.querySelector('.popup__button');
 let cardForDelete = null;
 let cardIdForDelete = null;
 
@@ -22,7 +20,6 @@ const confirmDeleteCard = () => {
             .then(() => {
                 cardForDelete.remove();
                 closeModal(popupDeleteCard);
-                popupDeleteButton.removeEventListener('click', confirmDeleteCard);
             })
             .catch((err) => {
                 console.log(err);
@@ -33,7 +30,6 @@ const confirmDeleteCard = () => {
 const deleteCard = (card, cardId) => {
     cardForDelete = card;
     cardIdForDelete = cardId;
-    popupDeleteButton.addEventListener('click', confirmDeleteCard);
     openModal(popupDeleteCard);
 }
 
@@ -73,4 +69,4 @@ const createCard = (initialCard, callbacks, userId) => {
     return cardElement;
 }
 
-export {createCard, deleteCard, likeCard}
+export {createCard, deleteCard, likeCard, confirmDeleteCard}

@@ -1,3 +1,4 @@
+const cardTemplate = document.querySelector('#card-template').content.querySelector('.card');
 const placesList = document.querySelector('.places__list');
 const popupGallery = document.querySelector('.popup_type_image');
 const popupGalleryImage = popupGallery.querySelector('.popup__image');
@@ -18,6 +19,8 @@ const nameInputNewCard = formNewCard.querySelector('.popup__input_type_card-name
 const linkInputNewCard = formNewCard.querySelector('.popup__input_type_url');
 const formEditAvatar = popupEditAvatar.querySelector('.popup__form');
 const linkInputEditAvatar = formEditAvatar.querySelector('.popup__input_type_avatar-link');
+const popupDeleteCard = document.querySelector('.popup_type_delete-card');
+const popupDeleteButton = popupDeleteCard.querySelector('.popup__button');
 const validationConfig = {
     formSelector: '.popup__form',
     inputSelector: '.popup__input',
@@ -27,4 +30,4 @@ const validationConfig = {
     errorClass: 'popup__error_visible'
 };
 
-export {placesList, popupGallery, popupGalleryImage, popupGalleryCaption, popupEditProfile, popupNewCard, popupEditAvatar, editProfileButton, addCardButton, profileImage, profileName, profileJob, formEditProfile, nameInputEditProfile, jobInputEditProfile, formNewCard, nameInputNewCard, linkInputNewCard, formEditAvatar, linkInputEditAvatar, validationConfig};
+export {placesList, cardTemplate, popupGallery, popupGalleryImage, popupGalleryCaption, popupEditProfile, popupNewCard, popupEditAvatar, editProfileButton, addCardButton, profileImage, profileName, profileJob, formEditProfile, nameInputEditProfile, jobInputEditProfile, formNewCard, nameInputNewCard, linkInputNewCard, formEditAvatar, linkInputEditAvatar, popupDeleteCard, popupDeleteButton, validationConfig};
